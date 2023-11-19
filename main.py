@@ -1,3 +1,4 @@
+# %%
 import os
 import logging 
 import requests 
@@ -43,7 +44,10 @@ logger.addHandler(console_handler)
 
 # using logging is better than using print statements because we can control the level of logging
 
-url = "https://odds.p.rapidapi.com/v4/sports/americanfootball_nfl/scores"
+# %%
+# Api request
+
+url = "https://odds.p.rapidapi.com/v4/sports/soccer_poland_ekstraklasa/scores"
 headers       =   {"X-RapidAPI-Key": API_KEY, 
                    "X-RapidAPI-Host": API_HOST}
 
@@ -68,7 +72,68 @@ except RequestException as request_err:
     logger.error(f'Request error occurred: {request_err}')
 
 # parse the api response
-standings_data = api_response.json()
+upcoming_matches = api_response.json()
 
 # print api response
-logger.info(standings_data)
+# logger.info(standings_data)
+
+
+#4.4 step
+# save response to file and read it via jq
+with open('football_table_standings.json', 'w') as f:
+    f.write(api_response.text)
+
+
+# %%
+# listing all sports
+url = "https://odds.p.rapidapi.com/v4/sports"
+headers       =   {"X-RapidAPI-Key": API_KEY, 
+                   "X-RapidAPI-Host": API_HOST}
+
+query_string  =   {"daysFrom":"3"}
+
+
+# making a request to the API
+try:
+    api_response_sport = requests.get(url, headers=headers, timeout=5)
+    api_response_sport.raise_for_status()
+    #write sports list to file
+    with open('sports_list.json', 'w') as f:
+        f.write(api_response_sport.text)
+
+        
+except requests.HTTPError as http_err:
+    logger.error(f'HTTP error occurred: {http_err}')
+
+
+# %% [markdown]
+# lista sportów
+# jq .[].key ".\sports_list.json"
+
+# %%
+df = []
+columns = ['time']
+
+for matches in upcoming_matches:
+    for key in matches.keys():
+        if key not in columns:
+            columns.append(key)
+    df.append(matches)
+
+matches_df = pd.DataFrame(df, columns=columns)
+    
+
+# %%
+matches_df
+
+# %%
+selected_columns = ['commence_time', 'home_team', 'away_team', 'completed']
+selected_df = matches_df[selected_columns]
+
+# Convert commence_time to normal date format
+selected_df['commence_time'] = pd.to_datetime(selected_df['commence_time'])
+
+print(selected_df)
+
+
+
