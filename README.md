@@ -16,7 +16,7 @@ To get started with the project, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/football-results-app.git
+   git clone https://github.com/TokarskiPatryk/football-results-app.git
    ```
 
 2. Navigate to the project directory:
