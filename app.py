@@ -9,7 +9,9 @@ with open('football_table_standings.json') as f:
     matches_completed = json.load(f)
 
 completed = pd.json_normalize(matches_completed, record_path=['scores'], meta = ['commence_time'] , errors='ignore')
-completed = completed.pivot(index='commence_time', columns=('name'), values='score')
+if not completed.empty:
+    completed = completed.pivot(index='commence_time', columns=('name'), values='score',)
+    completed.reset_index(inplace=True)
 
 not_completed = matches[matches['completed'] == False]
 
