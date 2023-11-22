@@ -3,11 +3,8 @@ import streamlit as st
 import json 
 import main
 
-# run a function from main to get completed matches
-completed = main.get_completed_matches()
-
-# run a function from main to get upcoming matches
-upcoming = main.get_upcoming_matches()
+# Load data
+completed, upcoming = main.run()
 
 # Set the page configuration of the app
 st.set_page_config(
@@ -22,27 +19,22 @@ st.set_page_config(
 
 
 # Create columns for the layout and display the image through the 2nd one
-col1, col2 = st.columns([4, 1])
+#col1, col2 = st.columns([4, 1])
 # col2.image(prem_league_logo_image)
 
 # st.title("⚽🏆 Ekstraklasa - nadchodzące mecze ⚽🏆")
 
 show_completed = st.sidebar.radio('Pokazać nadchodzące, czy niedawno ukończone mecze?', ('Nadchodzące', 'Niedawno ukończone'))
 
+st.title("⚽🏆 Ekstraklasa ⚽🏆")
 
 if show_completed == 'Niedawno ukończone':
-    st.title("⚽🏆 Ekstraklasa - niedawno ukończone mecze ⚽🏆")
-    st.dataframe(completed)
+    st.title("Niedawno ukończone mecze")
+    if(completed is not None):
+        st.dataframe(completed)
+    else:
+        st.write("Brak niedawno ukończonych meczów")
     st.write("")
 else:
-    st.title("⚽🏆 Ekstraklasa - nadchodzące mecze ⚽🏆")
-    st.dataframe(upcoming)
-
-if st.button('Odśwież'):
-    main.rerun()
-    st.rerun()
-# Display instructions
-# st.sidebar.title('Instructions 📖')
-# st.sidebar.write("""
-# The table showcases the current Premier League standings for the 2023/24 season. Toggle the visualization options to gain deeper insights!
-# """)
+    st.title("Nadchodzące mecze")
+    st.dataframe(upcoming, hide_index=True)

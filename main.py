@@ -1,6 +1,7 @@
 # %%
 import os
-import logging 
+import logging
+import sys 
 import requests 
 import pandas as pd 
 from pandas import json_normalize
@@ -102,8 +103,12 @@ def get_upcoming_matches():
     columns = ['commence_time', 'home_team', 'away_team', 'completed']
     # TODO fix the error 'cannot access local variable 'upcoming_matches' where it is not defined'
     upcoming_matches2 = pd.json_normalize(upcoming_matches)[columns]
-
-    return upcoming_matches2[upcoming_matches2['completed'] == False]
+    upcoming_matches2 = upcoming_matches2[upcoming_matches2['completed'] == False]
+    upcoming_matches2.drop(columns=['completed'], inplace=True)
+    
+    upcoming_matches2['commence_time'] = pd.to_datetime(upcoming_matches2['commence_time']).dt.strftime('%d-%m %H:%M')
+    
+    return upcoming_matches2
 
 
 def get_completed_matches():
@@ -125,7 +130,13 @@ def get_completed_matches():
         matches_list.reset_index(inplace=True)
         return matches_list
     
-    # %%
-    get_upcoming_matches()
+    
+def run():
+    #upcoming_matches = get_api_response(url, headers, query_string)
+    completed = get_completed_matches()
+    upcoming = get_upcoming_matches()
+    return upcoming, completed
 
-# %%
+
+
+
