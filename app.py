@@ -3,17 +3,11 @@ import streamlit as st
 import json 
 import main
 
-matches = pd.read_json('matches.json')
+# run a function from main to get completed matches
+completed = main.get_completed_matches()
 
-with open('football_table_standings.json') as f:
-    matches_completed = json.load(f)
-
-completed = pd.json_normalize(matches_completed, record_path=['scores'], meta = ['commence_time'] , errors='ignore')
-if not completed.empty:
-    completed = completed.pivot(index='commence_time', columns=('name'), values='score',)
-    completed.reset_index(inplace=True)
-
-not_completed = matches[matches['completed'] == False]
+# run a function from main to get upcoming matches
+upcoming = main.get_upcoming_matches()
 
 # Set the page configuration of the app
 st.set_page_config(
@@ -42,10 +36,10 @@ if show_completed == 'Niedawno ukończone':
     st.write("")
 else:
     st.title("⚽🏆 Ekstraklasa - nadchodzące mecze ⚽🏆")
-    st.dataframe(not_completed)
+    st.dataframe(upcoming)
 
 if st.button('Odśwież'):
-    main.main()
+    main.rerun()
     st.rerun()
 # Display instructions
 # st.sidebar.title('Instructions 📖')
